@@ -1,54 +1,59 @@
-import Options from "./components/Options/Options";
-import Description from "./components/Description/Description";
-import Feedback from "./components/Feedback/Feedback";
-import Notification from "./components/Notification/Notification"
 import { useEffect, useState } from "react";
 
-const App = () => {
-  const [count, setCount] = useState( () => {
-        const val = localStorage.getItem("countValue");
-        const parsedVal = JSON.parse(val) ?? {
-      good: 0,
-      neutral: 0,
-      bad: 0
-    };
-        return parsedVal;
-  });
+import contactsData from "./Data/contactsData.json";
+import { nanoid } from "nanoid";
 
-  useEffect(() => {}, [])
+import ContactForm from "./components/ContactForm/ContactForm.jsx";
+import SearchBox from "./components/SearchBox/SearchBox.jsx";
+import ContactList from "./components/ContactList/ContactList.jsx";
+
+function App() {
+  const [users, setUsers] = useState(() => {
+    const stringifiedUsers = localStorage.getItem("users");
+    const parsedUsers = JSON.parse(stringifiedUsers) ?? contactsData;
+
+    return parsedUsers;
+  }); 
+  
+  const [filter, setFilter] = useState("");
+
   useEffect(() => {
-    const stringifiedValue = JSON.stringify(count);
-    localStorage.setItem("countValue", stringifiedValue)
-  }, [count]);
+    const stringifiedUsers = JSON.stringify(users);
+    localStorage.setItem("users", stringifiedUsers);
+  }, [users]);
 
-  const updateFeedback = (feedbackType) => {
-    setCount({ ...count, [feedbackType]: count[feedbackType] + 1 });
+  const onAddProfile = (formData) => {
+    const finalUser = {
+      ...formData,
+      id: nanoid(),
+    };
+
+    setUsers((prevState) => [...prevState, finalUser]);
   };
 
-  const resetFeedback = () => {
-    setCount({
-      good: 0,
-      neutral: 0,
-      bad: 0
-    })
-  }; 
+  const onDeleteProfile = (profileId) => {
+    const updatedUsers = users.filter((user) => user.id !== profileId);
+    setUsers(updatedUsers);
+  };
 
-  const totalFeedback = count.good + count.neutral + count.bad;
-  const positiveFeedback = Math.round((count.good / totalFeedback) * 100);
 
- return (
-<>
-     <Description />
-     <Options updateFeedback={updateFeedback}
-       resetFeedback={resetFeedback}
-       totalFeedback={totalFeedback} />
-     {totalFeedback === 0 && <Notification />}
-     {totalFeedback > 0 && <Feedback count={count}
-       totalFeedback={totalFeedback}
-       positiveFeedback={positiveFeedback}
-     />}
-</>
-);
-};
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(filter.toLowerCase().trim())
+  );
+
+  return (
+    <div>
+      <h1>Phonebook</h1>
+      <ContactForm onAddProfile={onAddProfile} />
+      <SearchBox filter={filter}
+        setFilter={setFilter} />
+      <ContactList filteredUsers={filteredUsers}
+        onDeleteProfile={onDeleteProfile}
+      />
+    </div>
+  );
+}
+
 
 export default App
