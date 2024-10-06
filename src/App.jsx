@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import contactsData from "./Data/contactsData.json";
+import contactsData from "./data/contactsData.json";
 import { nanoid } from "nanoid";
 
 import ContactForm from "./components/ContactForm/ContactForm.jsx";
