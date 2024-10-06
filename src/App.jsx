@@ -44,7 +44,7 @@ function App() {
 
   return (
     <div>
-      <h1>Phonebook</h1>
+      <h1 style={{marginLeft: "40px"}}>Phonebook</h1>
       <ContactForm onAddProfile={onAddProfile} />
       <SearchBox filter={filter}
         setFilter={setFilter} />
